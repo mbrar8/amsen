@@ -1,7 +1,7 @@
 import math
 class Map:
   def __init__(self, w, h):
-    self.map = [[0 for y in range(h)] for x in range(w)]
+    self.map = [[0 for x in range(w)] for y in range(h)]
     self.w = w
     self.h = h
     self.p = type('', (), {})
@@ -10,7 +10,7 @@ class Map:
 
   def obstruction(self, thetaDegrees, distance):
     p = self.pos(thetaDegrees, distance)
-    self.map[p.x][p.y]=1
+    self.map[p.y][p.x]=1
 
   def move(self, thetaDegrees, distance):
     self.p = self.pos(thetaDegrees, distance)    
@@ -25,19 +25,19 @@ class Map:
   def printMap(self):
     for x in range(self.w):
       for y in range(self.h):
-        if (self.map[x][y]==1):
+        if (self.map[y][x]==1):
           print 'x',
         else:
           print ' ',
       print ''
 
   
-m=Map(100,100)
-for i in range(360):
-  m.obstruction(i,10)
-
-m.move(45, 50)
-for i in range(360):
-  m.obstruction(i,10)
-m.printMap()
+#m=Map(200,100)
+#for i in range(360):
+#  m.obstruction(i,10)
+#
+#m.move(90, 10)
+#for i in range(360):
+#  m.obstruction(i,10)
+#m.printMap()
 

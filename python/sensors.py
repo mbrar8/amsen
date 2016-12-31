@@ -1,3 +1,6 @@
+import sonar
+import arduino
+
 class Sensors:
   def __init__(self):
     self.sonar = Sonar()
@@ -17,7 +20,7 @@ class Sensors:
   def compass(self):
     return self.arduino.compass()
 
-  def readings(self):
+  def environment(self):
     return self.arduino.environment()
 
  

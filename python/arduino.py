@@ -12,3 +12,9 @@ class Arduino:
 		for x in parts:
 			final = x.split('=')
 			self.sensor_input[final[0]] = float(final[1])
+
+	def compass(self):
+		return self.sensor_input['CMP']
+
+	def environment(self):
+		return self.sensor_input;
