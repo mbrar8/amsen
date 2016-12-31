@@ -1,4 +1,5 @@
 import servo
+import math
 import time
 class Driver:
 
@@ -18,7 +19,31 @@ class Driver:
     self.right.stop()
     self.left.stop()
 
+  def timeToWait(self, inches):
+    return inches*self.oneRotationTime/self.circumference
+
+  def turn_left(self, degrees):
+    #turn left by degrees
+    print "Starting"
+    self.right.clockwise()
+    self.left.clockwise()
+    print "Turning"
+    inchesToMove = (degrees*8*math.pi)/360
+    timeToSleep = self.timeToWait(inchesToMove)
+    time.sleep(timeToSleep)
+    self.right.stop()
+    self.left.stop()
+    print "Stopping"
+
+  def turn_right(self, degrees):
+    #turn right by degrees
+    self.right.anticlockwise()
+    self.left.anticlockwise()
+    inchesToMove = (degrees*8*math.pi)/360
+    timeToSleep = self.timeToWait(inchesToMove)
+    time.sleep(timeToSleep)
+    self.right.stop()
+    self.left.stop()
 
 d = Driver()
-d.forward(12)
-
+d.turn_right(180)
