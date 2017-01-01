@@ -4,8 +4,8 @@ class Sonar:
   
   def __init__(self):
     # Initialze the variables
-    self.proximity = False
-    self.distance = 0
+    self.prox = False
+    self.dist = 100
     self.fail = False
     try: 
       self.ser = serial.Serial("/dev/ttyUSB0", 57600)
@@ -25,7 +25,7 @@ class Sonar:
     self.ser.read(self.ser.inWaiting())
     self.align()
     
-    self.proximity = self.ser.read() == '1'
+    self.prox = self.ser.read() == '1'
     self.ser.read() # 0x0d
     if (self.ser.read()!='R'):
       self.fail = True
@@ -35,9 +35,16 @@ class Sonar:
     b1 = self.ser.read()
     b0 = self.ser.read()
     
-    self.distance = int('{0}{1}{2}'.format(b2,b1,b0))
+    self.dist = int('{0}{1}{2}'.format(b2,b1,b0))
+    print "SONAR: ",self.dist, " PROXIMITY: " , self.prox
     self.fail = False
 
+  def proximity(self):
+    self.read()
+    return self.prox
 
+  def distance(self):
+    self.read()
+    return self.dist
 
-     
+   

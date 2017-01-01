@@ -10,8 +10,11 @@ class Map:
     self.angle = 0
 
   def obstruction(self, thetaDegrees, distance):
-    p = self.pos(thetaDegrees, distance)
-    self.map[p.y][p.x]=1
+    angle = thetaDegrees-2
+    while(angle <=thetaDegrees+2):
+      p = self.pos(angle, distance)
+      self.map[p.y][p.x]=1
+      angle+=0.1
     return p
 
   def move(self, thetaDegrees, distance):
@@ -24,6 +27,16 @@ class Map:
     pos.x = self.p.x + int(distance*math.cos(thetaRadians))
     pos.y = self.p.y + int(distance*math.sin(thetaRadians))
     return pos
+  
+  #
+  # Checks if there is any obstruction along the current direction upto given distance
+  #
+  def isBlocked(self, distance):
+    for d in range(distance):
+      p = self.pos(self.angle, d)
+      if (self.map[p.y][p.x]==1):
+        return True
+    return False
    
   def printMap(self):
     for x in range(self.w):

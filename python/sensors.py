@@ -12,15 +12,17 @@ class Sensors:
     self.arduino.read()
 
   def distance(self):
-    return self.sonar.distance
+    return self.sonar.distance()
 
   def proximity(self):
-    return self.sonar.promximity
+    return self.sonar.proximity()
 
   def compass(self):
     return self.arduino.compass()
 
   def environment(self):
-    return self.arduino.environment()
+    env= self.arduino.environment()
+    env['sonar']=self.sonar.distance()
+    return env
 
  

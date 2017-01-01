@@ -10,9 +10,7 @@ class API:
     #connect to the remote server
     self.baseUrl= 'https://blooming-hollows-23779.herokuapp.com/dbl'
 
-  def push(self, obs, pos, env):
-       env['ox']=obs.x
-       env['oy']=obs.y
+  def push(self, pos, env):
        env['x']=pos.x
        env['y']=pos.y
        dict_json = json.dumps(env)
@@ -26,15 +24,4 @@ class API:
        result = response.read()
        print result
 
-
-a = API()
-op = type('', (), {})
-pos = type('', (), {})
-op.x=10
-op.y=10
-pos.x=50
-pos.y=50
-env={"m1":10,"m2":40,"m3":60}
-
-a.push(op, pos, env)
 
