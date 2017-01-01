@@ -3,8 +3,8 @@ import arduino
 
 class Sensors:
   def __init__(self):
-    self.sonar = Sonar()
-    self.arduino = Arduino()
+    self.sonar = sonar.Sonar()
+    self.arduino = arduino.Arduino()
 
 
   def read(self):

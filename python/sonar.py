@@ -21,6 +21,8 @@ class Sonar:
 
   
   def read(self):
+    # Clear all the existing buffer first, we only want latest values
+    self.ser.read(self.ser.inWaiting())
     self.align()
     
     self.proximity = self.ser.read() == '1'

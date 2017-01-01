@@ -1,9 +1,40 @@
+from datetime import datetime
+import urllib2
+import urllib
+import json
+
+
 class API:
 
   def __init__(self):
     #connect to the remote server
+    self.baseUrl= 'https://blooming-hollows-23779.herokuapp.com/dbl'
 
-  def push(self, map, env):
-    # Push the map object to the remote server
+  def push(self, obs, pos, env):
+       env['ox']=obs.x
+       env['oy']=obs.y
+       env['x']=pos.x
+       env['y']=pos.y
+       dict_json = json.dumps(env)
+       now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+       print "pushing with date time : " + now
+       args = 'time=' + urllib.quote_plus(now)
+       args += '&reading='+ urllib.quote_plus(dict_json)
+       url = self.baseUrl + '?' + args
+       print url
+       response = urllib2.urlopen(url)
+       result = response.read()
+       print result
 
- 
+
+a = API()
+op = type('', (), {})
+pos = type('', (), {})
+op.x=10
+op.y=10
+pos.x=50
+pos.y=50
+env={"m1":10,"m2":40,"m3":60}
+
+a.push(op, pos, env)
+

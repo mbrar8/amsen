@@ -7,13 +7,16 @@ class Map:
     self.p = type('', (), {})
     self.p.x = int(w/2)
     self.p.y = int(h/2)
+    self.angle = 0
 
   def obstruction(self, thetaDegrees, distance):
     p = self.pos(thetaDegrees, distance)
     self.map[p.y][p.x]=1
+    return p
 
   def move(self, thetaDegrees, distance):
-    self.p = self.pos(thetaDegrees, distance)    
+    self.p = self.pos(thetaDegrees, distance)
+    self.angle = thetaDegrees   
 
   def pos(self, thetaDegrees, distance):
     thetaRadians = math.radians(thetaDegrees)

@@ -24,16 +24,13 @@ class Driver:
 
   def turn_left(self, degrees):
     #turn left by degrees
-    print "Starting"
     self.right.clockwise()
     self.left.clockwise()
-    print "Turning"
     inchesToMove = (degrees*8*math.pi)/360
     timeToSleep = self.timeToWait(inchesToMove)
     time.sleep(timeToSleep)
     self.right.stop()
     self.left.stop()
-    print "Stopping"
 
   def turn_right(self, degrees):
     #turn right by degrees
@@ -45,5 +42,25 @@ class Driver:
     self.right.stop()
     self.left.stop()
 
-d = Driver()
-d.turn_right(180)
+#d = Driver()
+#print "Move 15"
+#d.forward(15)
+#time.sleep(1)
+#print "Turn 90"
+#d.turn_left(90)
+#time.sleep(1)
+#print "Move 8"
+#d.forward(8)
+#time.sleep(1)
+#print "Turn 90"
+#d.turn_left(90)
+#time.sleep(1)
+#print "Move 15"
+#d.forward(15)
+#time.sleep(1)
+#print "Turn 90"
+#d.turn_left(90)
+#time.sleep(1)
+#print "Move 8"
+#d.forward(8)
+#time.sleep(1)
