@@ -3,15 +3,18 @@
 
 
 
+/*************************
+* PIN DEFINITIONS
+* GAS SENSORS
+**************************/
+#define PIN_MQ2 A0
+#define PIN_MQ4 A1
 
 /*************************
 * Gas sensor globals, these are circular buffers to store instant values
 * We report the average of these circular buffers on the serial port
+* Circular buffer for Sensors so that we can take a moving average
 *************************/
-// Circular buffer for Sensors so that we can take a moving average
-#define PIN_MQ2 A0
-#define PIN_MQ4 A1
-
 #define SV_SIZE 100
 int svMQ4[SV_SIZE];
 int svMQ2[SV_SIZE];
@@ -33,11 +36,18 @@ int HMC6352Address = 0x42;
 int compassSlaveAddress;
 String compassValue;
 
+/**************************
+*  SONAR GLOBALS
+**************************/
+#define trigPin 3
+#define echoPin 2
+long sonarValue;
 
 // the setup routine runs once when you press reset:
 void setup() {
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
+  initSonar();
   
   // Compute the compass slave address
   // Shift the device's documented slave address (0x42) 1 bit right
@@ -64,6 +74,8 @@ void readHumiture() {
     // as fast the sensor suports
     int chk = DHT11.read(DHT11PIN);
     /* 
+    uncomment this code to do status check on hurmiture value being properly measured
+    actual values are inside DHT11.humidity and DHT11.temperature, see output below
     switch (chk)
     {
       case DHTLIB_OK: 
@@ -94,6 +106,9 @@ void readGasSensors() {
   } 
 }
 
+/***********
+* read compass value
+************/
 void readCompass() {
     Wire.beginTransmission(compassSlaveAddress);
     Wire.write("A");
@@ -116,6 +131,26 @@ void readCompass() {
     compassValue += int (headingValue % 10);
 }
 
+void initSonar() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+void readSonar() {
+  long duration;
+  // Send the Trigger pulse
+  digitalWrite(trigPin, LOW); 
+  delayMicroseconds(2); 
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  // Wait for the echo
+  duration = pulseIn(echoPin, HIGH);
+  
+  // compute the distance
+  sonarValue = (duration/2) / 29.1;
+}
+
 /*********************************************
 * Output sends all the data collected on the serial port
 * using the following format
@@ -135,18 +170,21 @@ void output() {
     output += DHT11.temperature;
     output += ",CMP=";
     output += compassValue;
+    output += ",SNR=";
+    output += sonarValue;
     Serial.println(output);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
   readGasSensors();
- 
+
   // Every 1000th value we send the output on serial port
   if (index == 0) {
     // Read the sensors that take time to read
     readHumiture();
     readCompass();
+    readSonar();
     output();
   }
  
