@@ -20,8 +20,10 @@ class API:
        args += '&reading='+ urllib.quote_plus(dict_json)
        url = self.baseUrl + '?' + args
        print url
-       response = urllib2.urlopen(url)
-       result = response.read()
-       print result
-
+       try:
+         response = urllib2.urlopen(url)
+         result = response.read()
+         print result
+       except:
+         print "failed to talk to server"
 

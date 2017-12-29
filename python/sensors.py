@@ -3,26 +3,23 @@ import arduino
 
 class Sensors:
   def __init__(self):
-    self.sonar = sonar.Sonar()
     self.arduino = arduino.Arduino()
 
-
   def read(self):
-    self.sonar.read()
     self.arduino.read()
 
-  def distance(self):
-    return self.sonar.distance()
-
   def proximity(self):
-    return self.sonar.proximity()
+    dist = self.arduino.sonar();
+    print "checking proximit: ", dist
+    return dist > 0 and dist < 10 
 
   def compass(self):
     return self.arduino.compass()
 
+  def measure_compass(self):
+    return self.arduino.measure_compass()
+
   def environment(self):
-    env= self.arduino.environment()
-    env['sonar']=self.sonar.distance()
-    return env
+    return self.arduino.environment()
 
  

@@ -12,26 +12,41 @@ class Arduino:
 		  self.data_in.read(self.data_in.inWaiting())
 		  var = self.data_in.readline()
 		  try:
-                    print var
 		    parts = var.split(',')
 		    print parts
 		    for x in parts:
 			final = x.split('=')
 			self.sensor_input[final[0]] = float(final[1])
-                    self.sensor_input['CMP']
+                    # Check that compass and sonar value is present in sensor_input, if its missing than its garbage value we should ignore
+		    self.sensor_input['CMP']
+		    self.sensor_input['SNR']
 		    return
 		  except:
 		    print "ignoring garbgage"
 
-	def compass(self):
+	def measure_compass(self):
 		self.read()
 		return self.sensor_input['CMP']
 
-	def environment(self):
+	def measure_sonar(self):
+		self.read()
+		return self.sensor_input['SNR']
+
+        def compass(self):
+		return self.sensor_input['CMP']
+        
+        def sonar(self):
+		return self.sensor_input['SNR']
+	
+        def environment(self):
 		return self.sensor_input;
 
+'''
+'Test code
+a = Arduino()
+while True:
+  a.read()
+  print a.sensor_input
+  time.sleep(1)
+'''
 
-#a = Arduino()
-#while True:
-#  print a.compass()
-#  time.sleep(1)
