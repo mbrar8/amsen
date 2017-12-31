@@ -83,6 +83,7 @@ class Motor:
     print("Error %i : %s" % (eCode, description))
 
   def turn(self, steps):
+    self.progress = 0 
     self.start_position = self.position
     self.target = self.start_position + steps    
     self.ch.setAcceleration(self.accl)

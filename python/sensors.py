@@ -10,7 +10,6 @@ class Sensors:
 
   def proximity(self):
     dist = self.arduino.sonar();
-    print "checking proximit: ", dist
     return dist > 0 and dist < 10 
 
   def compass(self):

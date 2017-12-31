@@ -10,25 +10,29 @@ import time
 class Controller:
   def __init__(self):
     self.sensors = sensors.Sensors()
-    self.map = map.Map(1000,1000)
+    self.map = map.Map(80,100,10)
     self.api = api.API()
     self.driver = driver2.Driver()
     self.turns = 0
     self.direction = True
-   
+    self.LANE_WIDTH = 12
+    self.FORWARD_DIST = 120
+    self.PROXIMITY_DIST = 10
+  
+ 
   def run(self):
-    self.map.move(self.sensors.measure_compass(),0)
-    while(True):
-      print "Reading Sensors"
-      self.sensors.read()
-       
-      # Push the readings to the server
-      self.api.push(self.map.p, self.sensors.environment())
-
-      # Move to a new location
-      print "Moving Turn: ", self.turns
-      self.move()
-      self.turns=self.turns+1
+    try:
+     # self.map.move(self.sensors.measure_compass(),0)
+      while(True):       
+        # Move to a new location
+        print "Moving Turn: ", self.turns
+        self.move()
+        self.map.printMap(80,80)
+        self.turns=self.turns+1
+    except:
+      print "Caught exception, stopping driver"
+      self.driver.stop()
+      raise
 
   #
   # The scan algorithm , this method continously scans a room and makes the next move necessary
@@ -37,43 +41,56 @@ class Controller:
     self.sensors.read()
     if (self.sensors.proximity()):
       # Record the obstruction
-      self.map.obstruction(self.sensors.compass(), 1)
+      self.map.obstruction(self.sensors.compass(), self.PROXIMITY_DIST)
       # Make a turn
       if (self.direction):
         self.turn_left(90)
-        self.forward(24)
+        self.forward(self.LANE_WIDTH)
         self.turn_left(90)
         self.direction = False
       else:
         self.turn_right(90)
-        self.forward(24)
+        self.forward(self.LANE_WIDTH)
         self.turn_right(90)
         self.direction = True
-    self.forward(12)
+    #Move in a straight line until obstruction discovered
+    self.forward(self.FORWARD_DIST)
  
   def forward(self, inches):
     print "Forward: ", inches
+    # Read sensors and check for proximity so that if the robot has turned it checks if there is an obstacle in front of it rather than just start moving forward
+    self.sensors.read()
+    if self.sensors.proximity():
+	return
     self.driver.forward(inches)
+    progress = 0
+    obstructed = False
     # wait while checking for obstructions
-    distance_moved = inches
-    while not self.driver.isDone():
-      self.sensors.read()
-      print "moving forward , checking proximity: ", self.sensors.proximity()
-      if self.sensors.proximity():
-	progress = self.driver.stop()
-        distance_moved *= progress/100
-        self.map.obstruction(self.sensors.compass(), distance_moved + 1)
-        break
-      time.sleep(0.1)
-
-    self.map.move(self.sensors.measure_compass(), distance_moved)
+    while not self.driver.isDone() and not obstructed:
+      new_progress = self.driver.progress()
+      diff = new_progress - progress
+      rel_dist = diff*inches/100
+      if rel_dist > 2:
+        self.sensors.read()
+	print "Progress = %f new_progress = %f rel_dist = %f compass = %f proximity = %f" % (progress, new_progress, rel_dist, self.sensors.compass(), self.sensors.proximity()) 
+        # Using map angle as dead reckoning should be more accurate, and moving in a straight line
+        self.map.move(self.map.angle, rel_dist)
+	progress = new_progress
+        if self.sensors.proximity():
+	  self.driver.stop()
+	  self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)	  
+      	  obstructed = True
+        # Push the readings to the server
+        # TODO: API takes too long to return, so need to cache the map position and sensor values and later push to API when the robot is stopped
+	#self.api.push(self.map.p, self.sensors.environment())
+      else:
+        time.sleep(0.1)
     
   def turn_left(self, deg):
     print "turn_left : ", deg
     self.driver.turn_left(deg)
     self.driver.wait()
     desiredAngle = self.wrapAngle(self.map.angle - deg)
-    #self.align(desiredAngle)
     self.map.move(desiredAngle,0)
 
   def turn_right(self, deg):
@@ -81,7 +98,6 @@ class Controller:
     self.driver.turn_right(deg)
     self.driver.wait()
     desiredAngle = self.wrapAngle(self.map.angle + deg)
-    #self.align(desiredAngle)
     self.map.move(desiredAngle,0)
 
   # 
@@ -96,25 +112,6 @@ class Controller:
       desiredAngle = desiredAngle % 360
     return desiredAngle
 
-  def align(self, act):
-    
-    print "ALIGN: " 
-    pos = self.sensors.measure_compass()
-    diff = abs(pos - act)
-	
-    while diff >= 4:
-        print "POS: " , pos, "\tACT: ", act, "\tDIFF:",diff
-	if pos < act:
-	   self.driver.turn_right(1)
-	   print "Adjusting: Turning right by 4" 
-	else:
-	   self.driver.turn_left(1)
-	   print "Adjusting: Turning left by 4"
-        self.driver.wait()
-	pos = self.sensors.measure_compass()
-        diff = abs(pos - act)
-        time.sleep(0.5)
-   
-    print "POS: " , pos, "\tACT: ", act, "\tDIFF:",diff
+ 
 c = Controller()
 c.run()

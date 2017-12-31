@@ -18,6 +18,7 @@ class Driver:
     self.oneRotationTime=20
     self.accl = 800
     self.velocity = 2000
+    
   
   def distanceToSteps(self, inches):
     degrees = inches*360/self.wheel_circumference
@@ -54,7 +55,11 @@ class Driver:
     '''
     self.left.stop()
     self.right.stop()
+    return self.progress()
+
+  def progress(self):
     return min(self.left.progress, self.right.progress)
+ 
 
   def isDone(self):
     return self.left.isDone() and self.right.isDone()
