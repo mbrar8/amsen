@@ -3,16 +3,16 @@ import math
 import sensors
 import map
 import api
-import driver2
+import driver
 
 import time
 
 class Controller:
   def __init__(self):
     self.sensors = sensors.Sensors()
-    self.map = map.Map(80,100,10)
+    self.map = map.Map(240,240,10)
     self.api = api.API()
-    self.driver = driver2.Driver()
+    self.driver = driver.Driver()
     self.turns = 0
     self.direction = True
     self.LANE_WIDTH = 12
