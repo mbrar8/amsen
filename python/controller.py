@@ -1,5 +1,6 @@
 import math
 
+import random
 import sensors
 import map
 import api
@@ -18,6 +19,7 @@ class Controller:
     self.LANE_WIDTH = 12
     self.FORWARD_DIST = 120
     self.PROXIMITY_DIST = 10
+    self.MIN_UNVISITED_AREA = 10
   
  
   def run(self):
@@ -26,7 +28,7 @@ class Controller:
       while(True):       
         # Move to a new location
         print "Moving Turn: ", self.turns
-        self.move()
+        self.greedy_walk()
         self.map.printMap(80,80)
         self.turns=self.turns+1
     except:
@@ -53,15 +55,39 @@ class Controller:
         self.forward(self.LANE_WIDTH)
         self.turn_right(90)
         self.direction = True
-    #Move in a straight line until obstruction discovered
+    # Move in a straight line until obstruction discovered
     self.forward(self.FORWARD_DIST)
- 
+
+
+  def greedy_walk(self):
+    self.sensors.read()
+    if (self.sensors.proximity()):
+      # Record the obstruction
+      self.map.obstruction(self.sensors.compass(), self.PROXIMITY_DIST)
+      left_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle - 90), self.FORWARD_DIST)
+      right_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle + 90), self.FORWARD_DIST)
+      # Make a turn
+      if max(left_unvisited_area, right_unvisited_area) < self.MIN_UNVISITED_AREA:
+          if random.random() > 0.5:
+              self.turn_left(90)
+          else:
+              self.turn_right(90)
+      elif left_unvisited_area > right_unvisited_area:
+        self.turn_left(90)
+      else:
+        self.turn_right(90)
+    # Move in a straight line until obstruction discovered
+    self.forward(self.FORWARD_DIST)
+
+
+
+
   def forward(self, inches):
     print "Forward: ", inches
     # Read sensors and check for proximity so that if the robot has turned it checks if there is an obstacle in front of it rather than just start moving forward
     self.sensors.read()
     if self.sensors.proximity():
-	return
+      return
     self.driver.forward(inches)
     progress = 0
     obstructed = False
@@ -72,17 +98,23 @@ class Controller:
       rel_dist = diff*inches/100
       if rel_dist > 2:
         self.sensors.read()
-	print "Progress = %f new_progress = %f rel_dist = %f compass = %f proximity = %f" % (progress, new_progress, rel_dist, self.sensors.compass(), self.sensors.proximity()) 
+        print "Progress = %f new_progress = %f rel_dist = %f compass = %f proximity = %f" % (progress, new_progress, rel_dist, self.sensors.compass(), self.sensors.proximity())
         # Using map angle as dead reckoning should be more accurate, and moving in a straight line
         self.map.move(self.map.angle, rel_dist)
-	progress = new_progress
+        progress = new_progress
         if self.sensors.proximity():
-	  self.driver.stop()
-	  self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)	  
-      	  obstructed = True
+          self.driver.stop()
+          self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)
+          obstructed = True
+        # Check if the amount of unvisited area in this direction is too little
+        unvisited_area = self.map.unvisited_area(self.map.angle, int(progress*inches))
+        if unvisited_area < self.MIN_UNVISITED_AREA:
+            print "Unvisited Area: %f" % (unvisited_area)
+            self.driver.stop()
+            break
         # Push the readings to the server
         # TODO: API takes too long to return, so need to cache the map position and sensor values and later push to API when the robot is stopped
-	#self.api.push(self.map.p, self.sensors.environment())
+        #self.api.push(self.map.p, self.sensors.environment())
       else:
         time.sleep(0.1)
     
