@@ -9,7 +9,7 @@ import time
 class Motor:
 
   def __init__(self, id):
-    # Instantiate the servos
+    # Instantiate the motors
     self.id = id
     self.accl = 800
     self.velocity = 2000

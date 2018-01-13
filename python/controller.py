@@ -39,6 +39,9 @@ class Controller:
   #
   # The scan algorithm , this method continously scans a room and makes the next move necessary
   #
+  '''
+  #This algorithim has been commented out and replaced by greedy_walk, as greedy_walk is a different algorithm
+  #This algorithm moves in a wavy pattern - it goes up until it hits an obstruction, and moves right creating lanes
   def move(self):
     self.sensors.read()
     if (self.sensors.proximity()):
@@ -57,27 +60,28 @@ class Controller:
         self.direction = True
     # Move in a straight line until obstruction discovered
     self.forward(self.FORWARD_DIST)
+'''
 
-
+#This algorithm when it hits an obstruction chooses to turn to the side that has more unvisited area
   def greedy_walk(self):
-    self.sensors.read()
-    if (self.sensors.proximity()):
-      # Record the obstruction
-      self.map.obstruction(self.sensors.compass(), self.PROXIMITY_DIST)
-      left_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle - 90), self.FORWARD_DIST)
-      right_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle + 90), self.FORWARD_DIST)
-      # Make a turn
-      if max(left_unvisited_area, right_unvisited_area) < self.MIN_UNVISITED_AREA:
-          if random.random() > 0.5:
-              self.turn_left(90)
-          else:
-              self.turn_right(90)
-      elif left_unvisited_area > right_unvisited_area:
-        self.turn_left(90)
-      else:
-        self.turn_right(90)
-    # Move in a straight line until obstruction discovered
-    self.forward(self.FORWARD_DIST)
+      self.sensors.read()
+      if (self.sensors.proximity()):
+        # Record the obstruction
+        self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)
+        left_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle - 90), self.FORWARD_DIST)
+        right_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle + 90), self.FORWARD_DIST)
+        # Make a turn
+        if max(left_unvisited_area, right_unvisited_area) < self.MIN_UNVISITED_AREA:
+            if random.random() > 0.5:
+                self.turn_left(90)
+            else:
+                self.turn_right(90)
+        elif left_unvisited_area > right_unvisited_area:
+          self.turn_left(90)
+        else:
+          self.turn_right(90)
+      # Move in a straight line until obstruction discovered
+      self.forward(self.FORWARD_DIST)
 
 
 

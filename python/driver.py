@@ -19,13 +19,13 @@ class Driver:
     self.accl = 800
     self.velocity = 2000
     
-  
-  def distanceToSteps(self, inches):
-    degrees = inches*360/self.wheel_circumference
-    return self.wheel_degreesToSteps(degrees) 
-  
+
   def wheel_degreesToSteps(self, degrees):
     return degrees*6400/360
+
+  def distanceToSteps(self, inches):
+    degrees = inches*360/self.wheel_circumference
+    return self.wheel_degreesToSteps(degrees)
 
   def robo_degreesToSteps(self, degree):
     distance = degree*self.robo_circumference/360
