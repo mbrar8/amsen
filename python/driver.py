@@ -18,7 +18,7 @@ class Driver:
     self.oneRotationTime=20
     self.accl = 800
     self.velocity = 2000
-    
+
 
   def wheel_degreesToSteps(self, degrees):
     return degrees*6400/360
