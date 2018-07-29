@@ -62,7 +62,7 @@ class Controller:
     self.forward(self.FORWARD_DIST)
 '''
 
-#This algorithm when it hits an obstruction chooses to turn to the side that has more unvisited area
+#This algorithm when it hits an obstruction chooses to turn to the side that has more unvisited area according to the map
   def greedy_walk(self):
       self.sensors.read()
       if (self.sensors.proximity()):
