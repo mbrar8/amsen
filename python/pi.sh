@@ -1,5 +1,5 @@
 #!/bin/bash
-host=192.168.0.8
+host=192.168.86.38
 scp ~/amsen/git/amsen/python/*.py pi@$host:/home/pi/Strnad/amsen/python
 scp ~/amsen/git/amsen/python/*.sh pi@$host:/home/pi/Strnad/amsen/python
 echo executing run.sh on raspberry pi
