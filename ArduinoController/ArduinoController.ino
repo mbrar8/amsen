@@ -42,50 +42,25 @@ String compassValue;
 **************************/
 
 
-#define trigPin_fwd 3
-#define echoPin_fwd 2
-#define trigPin_right 4
-#define echoPin_right 5
-#define trigPin_left 6
-#define echoPin_left 7
 
-#define SONAR_NUM 3 //Number of sonar sensors
+#define SONAR_NUM 7 //Number of sonar sensors
 #define MAX_DISTANCE 150 //Max distance cm
-#define PING_INTERVAL 33 // Milliseconds between pings.
-
-unsigned long pingTimer[SONAR_NUM]; // When each pings.
-unsigned int cm[SONAR_NUM]; // Store ping distances.
-uint8_t currentSensor = 0; // Which sensor is active.
-
 
 NewPing sonar[SONAR_NUM] = {
-  NewPing(trigPin_left, echoPin_left, MAX_DISTANCE),
-  NewPing(trigPin_fwd, echoPin_fwd, MAX_DISTANCE),
-  NewPing(trigPin_right, echoPin_right, MAX_DISTANCE)
+  NewPing(22, 23, MAX_DISTANCE),
+  NewPing(24, 25, MAX_DISTANCE),
+  NewPing(26, 27, MAX_DISTANCE),
+  NewPing(28, 29, MAX_DISTANCE),
+  NewPing(30, 31, MAX_DISTANCE),
+  NewPing(32, 33, MAX_DISTANCE),
+  NewPing(34, 35, MAX_DISTANCE)
 };
-/**
-//Fwd Sonar
-NewPing sonar_fwd(trigPin_fwd,echoPin_fwd);
 
-//Right Sonar
-NewPing sonar_right(trigPin_right, echoPin_right);
-
-//Left Sonar
-NewPing sonar_left(trigPin_left, echoPin_left);
-**/
-
-long sonarValue_fwd;
-long sonarValue_right;
-long sonarValue_left;
 
 // the setup routine runs once when you press reset:
 void setup() {
   // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
-  //initSonar();
-  pingTimer[0] = millis() + 75; //First ping start in ms
-  for (uint8_t i = 1; i < SONAR_NUM; i++) {
-    pingTimer[i] = pingTimer[i - 1] + PING_INTERVAL;
   }
 
 
@@ -93,9 +68,9 @@ void setup() {
   // Shift the device's documented slave address (0x42) 1 bit right
   // This compensates for how the TWI library only wants the
   // 7 most significant bits (with the high bit padded with 0)
-  compassSlaveAddress = HMC6352Address >> 1;
-  Wire.begin();
-}
+  //compassSlaveAddress = HMC6352Address >> 1;
+  //Wire.begin();
+
 
 
 int average(int array[SV_SIZE]) {
@@ -171,98 +146,14 @@ void readCompass() {
   compassValue += int (headingValue % 10);
 }
 
-void initSonar() {
-  //pinMode(trigPin_fwd, OUTPUT);
-  //pinMode(echoPin_fwd, INPUT);
-  pinMode(trigPin_right, OUTPUT);
-  pinMode(echoPin_right, INPUT);
-  //pinMode(trigPin_left, OUTPUT);
-  //pinMode(echoPin_left, INPUT);
-}
 
-int count = 0;
 
-long readSonar(int trigPin, int echoPin) {
-  long duration;
-  long sonarValue;
 
-  // Send the Trigger pulse
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
+int readSonar() {
 
-  // Wait for the echo
-  duration = pulseIn(echoPin, HIGH, 50000);
-
-  // compute the distance
-  sonarValue = (duration / 2) / 29.1;
-  Serial.print("SonarValue: ");
-  Serial.print(count);
-  Serial.print("   ");
-  Serial.println(sonarValue);
-  count = count + 1;
-  return sonarValue;
 
   
 }
-
-//void readAllSonar() {
-  //sonarValue_fwd = readSonar(trigPin_fwd, echoPin_fwd);
-  //sonarValue_right = readSonar(trigPin_right, echoPin_right);
-  //sonarValue_left = readSonar(trigPin_left, echoPin_left);
-  //sonarValue_right = sonar_right.ping_in();
-  //sonarValue_fwd = sonar_fwd.ping_in();
-  //sonarValue_left = sonar_left.ping_in();
-  /**
-   if (sonarValue_right == 2) {
-    return;
-  }
-  if (sonarValue_fwd == 2) {
-    return;
-  }
-  if (sonarValue_left == 2) {
-    return;
-  }
-  Serial.println("SNR F: ");
-  Serial.println(sonarValue_fwd);
-  Serial.println("SNR R: ");
-  Serial.println(sonarValue_right);
-  Serial.println("SNR L: ");
-  Serial.println(sonarValue_left);
-  **/
-//}
-void echoCheck() { // If ping echo, set distance to array. Calculating distance
-  if (sonar[currentSensor].check_timer())
-    cm[currentSensor] = sonar[currentSensor].ping_result / US_ROUNDTRIP_CM;
-}
- 
-void oneSensorCycle() { // Printing sonar results.
-  for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    Serial.print(i);
-    Serial.print("=");
-    Serial.print(cm[i]);
-    Serial.print("cm ");
-  }
-  Serial.println();
-}
-
-void readAllSonar() {
-  for (uint8_t i = 0; i < SONAR_NUM; i++) {
-    if (millis() >= pingTimer[i]) {
-      pingTimer[i] += PING_INTERVAL * SONAR_NUM;
-      if (i == 0 && currentSensor == SONAR_NUM - 1)
-        oneSensorCycle(); // Do something with results.
-      sonar[currentSensor].timer_stop();
-      currentSensor = i;
-      cm[currentSensor] = 0;
-      sonar[currentSensor].ping_timer(echoCheck);
-    }
-  }
-}
-
-
 
 /*********************************************
 * Output sends all the data collected on the serial port
@@ -272,6 +163,14 @@ void readAllSonar() {
 * MQ4=10,MQ2=5,MQ3=54,HUM=35,TMP=32,CMP=120
 **********************************************/
 void output() {
+    //sonar count starts at far left when facing front
+  int d1 = sonar[0].ping_cm();
+  int d2 = sonar[1].ping_cm();
+  int d3 = sonar[2].ping_cm();
+  int d4 = sonar[3].ping_cm();
+  int d5 = sonar[4].ping_cm();
+  int d6 = sonar[5].ping_cm();
+  int d7 = sonar[6].ping_cm();
   String output = "";
   output += "MQ4=";
   output += average(svMQ4);
@@ -283,18 +182,28 @@ void output() {
   output += DHT11.temperature;
   output += ",CMP=";
   output += compassValue;
-  //output += ",SNR_FWD=";
-  //output += sonarValue_fwd;
-  output += ",SNR_RHGT=";
-  output += sonarValue_right;
-  //output += ",SNR_LFT=";
-  //output += sonarValue_left;
+  output += ",SNR_1=";
+  //Left most sonar (robot's front)
+  output += d1;
+  output += ",SNR_2=";
+  output += d2;
+  output += ",SNR_3=";
+  output += d3;
+  output += ",SNR_4=";
+  //Center Sonar
+  output += d4;
+  output += ",SNR_5=";
+  output += d5;
+  output += ",SNR_6=";
+  output += d6;
+  output += ",SNR_7=";
+  //Rightmost sonar (robot's front)
+  output += d7;
   Serial.println(output);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {  
-  readAllSonar();
   //delay(100);
   return;
   readGasSensors();
@@ -305,7 +214,6 @@ void loop() {
     // Read the sensors that take time to read
     readHumiture();
     readCompass();
-    readAllSonar();
     output();
   }
 
