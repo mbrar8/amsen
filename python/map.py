@@ -14,7 +14,7 @@ class Map:
         self.p = type('', (), {})
         self.p.x = int(self.w / 2)
         self.p.y = int(self.h / 2)
-        self.SONAR_RANGE = 10
+        self.SONAR_RANGE = 5
         self.ROBOT_OBSTRUCTION_DIAMETER = 11 * self.SCALE
 
         # bounding box for the visited or obstructed area

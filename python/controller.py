@@ -1,5 +1,6 @@
 import math
 
+import arduino
 import random
 import sensors
 import map
@@ -62,12 +63,17 @@ class Controller:
     self.forward(self.FORWARD_DIST)
 '''
 
-#This algorithm when it hits an obstruction chooses to turn to the side that has more unvisited area according to the map
+# This algorithm when it hits an obstruction chooses to turn to the side that has more unvisited area according to map
   def greedy_walk(self):
       self.sensors.read()
-      if (self.sensors.proximity()):
-        # Record the obstruction
-        self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)
+      proxArray = self.sensors.proximity()
+      if proxArray[7]:
+        sonarArray = self.arduino.sonar()
+        for i in sonarArray:
+            if proxArray[i]:
+                self.map.obstruction(i*30, sonarArray[i])
+            else:
+                continue
         left_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle - 90), self.FORWARD_DIST)
         right_unvisited_area = self.map.unvisited_area(self.wrapAngle(self.map.angle + 90), self.FORWARD_DIST)
         # Make a turn
@@ -90,7 +96,7 @@ class Controller:
     print "Forward: ", inches
     # Read sensors and check for proximity so that if the robot has turned it checks if there is an obstacle in front of it rather than just start moving forward
     self.sensors.read()
-    if self.sensors.proximity():
+    if self.sensors.proximity()[7]:
       return
     self.driver.forward(inches)
     progress = 0
@@ -106,7 +112,7 @@ class Controller:
         # Using map angle as dead reckoning should be more accurate, and moving in a straight line
         self.map.move(self.map.angle, rel_dist)
         progress = new_progress
-        if self.sensors.proximity():
+        if self.sensors.proximity()[7]:
           self.driver.stop()
           self.map.obstruction(self.map.angle, self.PROXIMITY_DIST)
           obstructed = True

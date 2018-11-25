@@ -20,8 +20,8 @@ class Arduino:
                 final = x.split('=')
                 self.sensor_input[final[0]] = float(final[1])
             # Check that compass and sonar value present in sensor_input, if missing than it's garbage value to ignore
-            self.sensor_input['CMP']
-            self.sensor_input['SNR']
+            #self.sensor_input['CMP']
+            self.sensor_input['SNR_1']
             return
         except:
             print "ignoring garbage"
@@ -38,7 +38,12 @@ class Arduino:
         return self.sensor_input['CMP']
         
     def sonar(self):
-        return self.sensor_input['SNR']
+        list = ["None"] * 7
+        for i in list:
+            list[i] = self.sensor_input['SNR_' + i+1]
+        return list
+
+
 
     def environment(self):
         return self.sensor_input

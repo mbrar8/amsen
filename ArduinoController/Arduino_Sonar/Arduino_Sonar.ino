@@ -33,18 +33,23 @@ void loop() {
   int d6 = sonar[5].ping_cm();
   //d7 is right side
   int d7 = sonar[6].ping_cm();
-  Serial.print(d1);
-  Serial.print("\t");
-  Serial.print(d2);
-  Serial.print("\t");
-  Serial.print(d3);
-  Serial.print("\t");
-  Serial.print(d4);
-  Serial.print("\t");
-  Serial.print(d5);
-  Serial.print("\t");
-  Serial.print(d6);
-  Serial.print("\t");
-  Serial.print(d7);
-  Serial.println("\tcm");
+  String output = "";
+  output += ",SNR_1=";
+  //Left most sonar (robot's front)
+  output += d1;
+  output += ",SNR_2=";
+  output += d2;
+  output += ",SNR_3=";
+  output += d3;
+  output += ",SNR_4=";
+  //Center Sonar
+  output += d4;
+  output += ",SNR_5=";
+  output += d5;
+  output += ",SNR_6=";
+  output += d6;
+  output += ",SNR_7=";
+  //Rightmost sonar (robot's front)
+  output += d7;
+  Serial.println(output);
 }
