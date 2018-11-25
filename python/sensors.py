@@ -50,6 +50,8 @@ class Sensors:
     sonarProxArray.append(anyProx)
     return sonarProxArray
 
+  # Have to add method that maps obstructions that wouldn't trigger a proximity alert
+
   def compass(self):
     return self.arduino.compass()
 

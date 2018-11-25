@@ -1,7 +1,7 @@
 #include <NewPing.h>
 
 
-#define MAX_DISTANCE 100
+#define MAX_DISTANCE 20
 #define SONAR_NUM 7
 
 NewPing sonar[SONAR_NUM] = {
